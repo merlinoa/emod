@@ -1,0 +1,12 @@
+Package: emod
+Type: Package
+Title: calculates and communicates emod for report
+Version: 0.0.0.9000
+Date: 2015-05-14
+Authora@R: person("Andy", "Merlino", email = "merlinoa88@gmail.com", role =
+    c("aut", "cre"))
+Description: calculates and communicates emod for report
+License: GPL-3
+Depends: R (>= 3.2.0)
+Imports:
+    dplyr
