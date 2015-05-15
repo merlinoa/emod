@@ -10,9 +10,9 @@
 #' @export
 #' @examples 
 #' set.seed(1234)
-#' loss_ncci(year = sample(c(2012, 2013, 2014), 20, replace = TRUE),
-#'      type = sample(c("MO", "IND"), 20, replace = TRUE),
-#'      incurred = rlnorm(20, 10, 2))
+#' test <- loss_ncci(year = sample(c(2012, 2013, 2014), 20, replace = TRUE),
+#'                   type = sample(c("MO", "IND"), 20, replace = TRUE),
+#'                   incurred = rlnorm(20, 10, 2))
 loss_ncci <- function(year, type, incurred) {
   loss_ncci_validate(year = year, type = type, incurred = incurred)
   loss_ncci <- list(year = year,
