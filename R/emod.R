@@ -18,12 +18,22 @@ emod <- function(loss, payroll, ...) UseMethod("emod")
 #' 
 #' @export
 #' @examples
-#' emod()
+#' payroll <- list("2012" = data.frame(class = as.factor(c("8868", "9101")), 
+#'                                     payroll = c(10000000, 2000000)),
+#'                 "2013" = data.frame(class = as.factor(c("8868", "9101")),
+#'                                     payroll = c(10500000, 2200000)),
+#'                 "2014" = data.frame(class = as.factor(c("8868", "9101")), 
+#'                                     payroll = c(11000000, 2400000))
+#'             )
+#' 
+#' emod(test, payroll)
 emod.loss_ncci <- function(loss, payroll, emod_year = 2015) {
   stopifnot(length(payroll) == 3)
   
-  year_class_factors <- dplyr::filter(class_factors, year == emod_year) %>%
-    select(-year)
+  load("R/sysdata.rda")
   
-  dplyr::left_join(payroll[1], year_class_factors)
+  year_class_factors <- dplyr::filter(class_factors, year == emod_year)
+  year_class_factors <- dplyr::select(year_class_factors, -year)
+  
+  dplyr::left_join(payroll[[1]], year_class_factors, by = "class")
 }
