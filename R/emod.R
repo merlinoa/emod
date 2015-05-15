@@ -16,11 +16,13 @@ emod <- function(loss, payroll, ...) UseMethod("emod")
 
 #' NCCI emod
 #' 
-#' 
+#' @export
+#' @examples
+#' emod()
 emod.loss_ncci <- function(loss, payroll, emod_year = 2015) {
   stopifnot(length(payroll) == 3)
   
-  year_class_factors <- filter(class_factors, year == emod_year) %>%
+  year_class_factors <- dplyr::filter(class_factors, year == emod_year) %>%
     select(-year)
   
   dplyr::left_join(payroll[1], year_class_factors)
