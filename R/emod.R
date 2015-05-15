@@ -27,7 +27,7 @@ emod <- function(loss, payroll, ...) UseMethod("emod")
 #'             )
 #' 
 #' emod(test, payroll)
-emod.loss_ncci <- function(loss, payroll, emod_year = 2015) {
+emod.loss_ncci <- function(loss, payroll, emod_year = 2015, primary_cut = 15500) {
   stopifnot(length(payroll) == 3)
   
   load("R/sysdata.rda")
@@ -35,5 +35,20 @@ emod.loss_ncci <- function(loss, payroll, emod_year = 2015) {
   year_class_factors <- dplyr::filter(class_factors, year == emod_year)
   year_class_factors <- dplyr::select(year_class_factors, -year)
   
-  dplyr::left_join(payroll[[1]], year_class_factors, by = "class")
+  factors <- dplyr::left_join(payroll[[1]], year_class_factors, by = "class")
+  
+  # expected ----------------------------------------------
+  expected <- factors$paroll / 100 * factors$elr
+  
+  # actual ------------------------------------------------
+  loss$primary <- min(loss$incurred, primary_cut)
+  loss$excess <- loss$incurred - loss$primary
+  
+  loss_year <- dplyr::group_by(loss, year)
+  loss_year <- dplyr::summarize(loss_year, 
+                                incurred = sum(incurred),
+                                primary = sum(primary),
+                                excess = sum(excess)
+                               )
+  loss_year
 }

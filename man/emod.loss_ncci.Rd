@@ -4,7 +4,8 @@
 \alias{emod.loss_ncci}
 \title{NCCI emod}
 \usage{
-\method{emod}{loss_ncci}(loss, payroll, emod_year = 2015)
+\method{emod}{loss_ncci}(loss, payroll, emod_year = 2015,
+  primary_cut = 15500)
 }
 \description{
 NCCI emod
