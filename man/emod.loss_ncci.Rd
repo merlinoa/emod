@@ -9,4 +9,15 @@
 \description{
 NCCI emod
 }
+\examples{
+payroll <- list("2012" = data.frame(class = as.factor(c("8868", "9101")),
+                                    payroll = c(10000000, 2000000)),
+                "2013" = data.frame(class = as.factor(c("8868", "9101")),
+                                    payroll = c(10500000, 2200000)),
+                "2014" = data.frame(class = as.factor(c("8868", "9101")),
+                                    payroll = c(11000000, 2400000))
+            )
+
+emod(test, payroll)
+}
 
