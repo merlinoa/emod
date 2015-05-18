@@ -27,21 +27,16 @@ emod <- function(loss, payroll, ...) UseMethod("emod")
 #'             )
 #' 
 #' emod(test, payroll)
-emod.loss_ncci <- function(loss, payroll, emod_year = 2015, primary_cut = 15500) {
+emod.loss_ncci <- function(loss, payroll) {
   stopifnot(length(payroll) == 3)
   
   load("R/sysdata.rda")
   
-  year_class_factors <- dplyr::filter(class_factors, year == emod_year)
-  year_class_factors <- dplyr::select(year_class_factors, -year)
-  
-  factors <- dplyr::left_join(payroll[[1]], year_class_factors, by = "class")
-  
-  # expected ----------------------------------------------
-  expected <- factors$paroll / 100 * factors$elr
-  
+  # expected by accident year
+  expected <- lapply(payroll, expected_ncci)
+  expected <- t(as.data.frame(expected))
   # actual ------------------------------------------------
-  loss$primary <- min(loss$incurred, primary_cut)
+  loss$primary <- min(loss$incurred, 15500)
   loss$excess <- loss$incurred - loss$primary
   
   loss_year <- dplyr::group_by(loss, year)
@@ -50,5 +45,22 @@ emod.loss_ncci <- function(loss, payroll, emod_year = 2015, primary_cut = 15500)
                                 primary = sum(primary),
                                 excess = sum(excess)
                                )
-  loss_year
+}
+
+# expected loss by year ------------------------
+expected_ncci <- function(payroll) {
+  
+  expected_class <- dplyr::left_join(payroll, class_factors_2015, by = "class")
+  
+  expected_class <- dplyr::mutate(expected_class,
+                                  expected_total = payroll / 100 * elr,
+                                  expected_primary = payroll / 100 * elr * d,
+                                  expected_excess = expected_total - expected_primary
+  )
+  apply(expected_class[, (length(expected_class) - 2):length(expected_class)], 2, sum)
+}
+
+# ballast calculation for expected losses greater than 5,562,875
+ballast <- function(expected) {
+  0.1 * expected + (2500 * expected * 11.65) / (expected + 700 * 11.65)
 }
