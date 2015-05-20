@@ -31,10 +31,8 @@ loss_ncci_validate <- function(year, type, incurred) {
   if (length(year) != length(type) || length(year) != length(incurred)) {
     errors <- "Error: year, type, and incurred must be of same length"
   }
-  # check year
-  if (!is.numeric(year)) {
-    errors <- c(errors, "Error: year must be of type numeric")
-  }
+  
+  # check number of years
   if (length(unique(year)) < 3) {
     warnings <- "Warniing: loss data contains less than 3 unique years. 
                  Assuming no losses for missing year(s)."
