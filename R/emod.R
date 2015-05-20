@@ -29,8 +29,6 @@ emod <- function(loss, payroll, ...) UseMethod("emod")
 #' emod(test, payroll)
 emod.loss_ncci <- function(loss, payroll) {
   
-  load("R/sysdata.rda")
-  
   # expected by accident year
   expected_annual <- loss_expected_ncci(payroll)
   expected_annual <- as.data.frame(t(as.data.frame(expected_annual)))
