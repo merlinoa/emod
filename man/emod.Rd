@@ -11,10 +11,10 @@ emod(loss, payroll, ...)
 \arguments{
 \item{loss}{S3 object of one of the loss classes defined in the \code{emod} package}
 
-\item{payroll}{a list of n data frames.  Each list element contains a data frame with
-two columns.  The first column is the payroll class and the second column is the
-payroll dollar value.  Each data frame is in a seperate list item and contains a
-years worth of payroll.}
+\item{payroll}{a data frame with
+two columns.  The first column is the payroll class and the second column is the payroll
+dollar value.  Payroll dollar value are for the entire 3 year period the NCCI emod takes
+into account (i.e. do not segregate payroll dollars by policy year)}
 
 \item{...}{additional arguments}
 }

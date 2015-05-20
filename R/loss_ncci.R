@@ -54,3 +54,43 @@ loss_ncci_validate <- function(year, type, incurred) {
     warning(warnings)
   }
 }
+
+
+#' summary.loss_ncci
+#' 
+#' Summarize loss_ncci by accident year
+#' 
+#' @param loss_ncci object of class loss_ncci
+#' 
+#' @export
+#' 
+#' @examples 
+#' test <- loss_ncci(year = sample(c(2011, 2012, 2013), 20, replace = TRUE),
+#'                   type = sample(c("MO", "IND"), 20, replace = TRUE),
+#'                   incurred = rlnorm(20, 10, 2))
+#'                   
+#' set.seed(1234)
+#' summary(test)
+# actual loss per year ----------------------------------------
+summary.loss_ncci <- function(loss_ncci) {
+  # 10% medical only reduction and cap primary losses at 15500
+  l <- loss_ncci
+  l$incurred[l$type == "MO"] <- l$incurred[l$type == "MO"] * 0.3
+  l$primary <- l$incurred
+  l$primary[l$primary > 15500] <- 15500
+  
+  # determine excess portion
+  l$excess <- l$incurred - l$primary
+  
+  # group by year and sum years
+  loss_year <- dplyr::group_by(l, year)
+  indemnity_claims <- dplyr::filter(loss_year, type == "IND")
+  indemnity_claims <- dplyr::summarise(indemnity_claims, indemnity_claims = n())
+  out <- dplyr::summarize(loss_year,
+                   claims = n(),
+                   incurred = sum(incurred),
+                   primary = sum(primary),
+                   excess = sum(excess)
+                   )
+  cbind(out, indemnity_claims)
+}

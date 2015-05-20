@@ -3,10 +3,10 @@
 #' generic function for calculating emods under various assumtions
 #' 
 #' @param loss S3 object of one of the loss classes defined in the \code{emod} package
-#' @param payroll a list of n data frames.  Each list element contains a data frame with
-#' two columns.  The first column is the payroll class and the second column is the
-#' payroll dollar value.  Each data frame is in a seperate list item and contains a
-#' years worth of payroll.
+#' @param payroll a data frame with
+#' two columns.  The first column is the payroll class and the second column is the payroll 
+#' dollar value.  Payroll dollar value are for the entire 3 year period the NCCI emod takes
+#' into account (i.e. do not segregate payroll dollars by policy year)
 #' @param ... additional arguments
 #' 
 #' @export
@@ -18,31 +18,27 @@ emod <- function(loss, payroll, ...) UseMethod("emod")
 #' 
 #' @export
 #' @examples
-#' payroll <- list("2012" = data.frame(class = as.factor(c("8868", "9101")), 
-#'                                     payroll = c(10000000, 2000000)),
-#'                 "2013" = data.frame(class = as.factor(c("8868", "9101")),
-#'                                     payroll = c(10500000, 2200000)),
-#'                 "2014" = data.frame(class = as.factor(c("8868", "9101")), 
-#'                                     payroll = c(11000000, 2400000))
-#'             )
+#' payroll <- data.frame(class = as.factor(c("8868", "9101")), 
+#'                       payroll = c(32000000, 6500000)
+#'                       )
+#'              
 #' set.seed(1234)
 #' test <- loss_ncci(year = sample(c(2012, 2013, 2014), 20, replace = TRUE),
 #'                   type = sample(c("MO", "IND"), 20, replace = TRUE),
 #'                   incurred = rlnorm(20, 10, 2))
 #' emod(test, payroll)
 emod.loss_ncci <- function(loss, payroll) {
-  stopifnot(length(payroll) == 3)
   
   load("R/sysdata.rda")
   
   # expected by accident year
-  expected_annual <- lapply(payroll, expected_ncci)
+  expected_annual <- loss_expected_ncci(payroll)
   expected_annual <- as.data.frame(t(as.data.frame(expected_annual)))
   expected_total <- sum(expected_annual$expected_total)
   expected_primary <- sum(expected_annual$expected_primary)
   expected_excess <- expected_total - expected_primary
   # actual ------------------------------------------------
-  actual_annual <- loss_annual(loss)
+  actual_annual <- summary.loss_ncci(loss)
   actual_total <- sum(actual_annual$incurred)
   actual_primary <- sum(actual_annual$primary)
   actual_excess <- sum(actual_annual$excess)
@@ -53,19 +49,23 @@ emod.loss_ncci <- function(loss, payroll) {
   b <- ballast(expected = expected_total)
   
   # calculate emod
-  emod <- (actual_primary + w * actual_excess + (1.0 - w) * expected_excess + b) / (expected_total + b)
-  list("expected_total" = expected_total,
-       "expected_primary" = expected_primary,
-       "actual_total" = actual_total,
-       "actual_primary" = actual_primary,
-       "w" = w,
-       "b" = b,
-       "emod" = emod
-       )
+  mod <- (actual_primary + w * actual_excess + (1.0 - w) * expected_excess + b) / (expected_total + b)
+  mod <- list("claims" = loss,
+              "payroll" = payroll,
+              "expected_total" = expected_total,
+              "expected_primary" = expected_primary,
+              "actual_total" = actual_total,
+              "actual_primary" = actual_primary,
+              "w" = w,
+              "b" = b,
+              "emod" = emod
+              )
+  class(mod) <- c("emod_ncci", "list")
+  mod
 }
 
 # expected loss by year ------------------------
-expected_ncci <- function(payroll) {
+loss_expected_ncci <- function(payroll) {
   
   expected_class <- dplyr::left_join(payroll, class_factors_2015, by = "class")
   
@@ -77,24 +77,7 @@ expected_ncci <- function(payroll) {
   apply(expected_class[, (length(expected_class) - 2):length(expected_class)], 2, sum)
 }
 
-# actual loss per year ----------------------------------------
-loss_annual <- function(loss) {
-  # 10% medical only reduction and cap primary losses at 15500
-  loss$incurred[loss$type == "MO"] <- loss$incurred[loss$type == "MO"] * 0.3
-  loss$primary <- loss$incurred
-  loss$primary[loss$primary > 15500] <- 15500
-  
-  # determine excess portion
-  loss$excess <- loss$incurred - loss$primary
-  
-  # group by year and sum years
-  loss_year <- dplyr::group_by(loss, year)
-  dplyr::summarize(loss_year, 
-                   incurred = sum(incurred),
-                   primary = sum(primary),
-                   excess = sum(excess)
-  )
-}
+
 
 # ballast calculation
 ballast <- function(expected) {
