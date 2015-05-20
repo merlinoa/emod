@@ -3,7 +3,7 @@
 #' S3 class for insurer loss information necessary to calculate the 
 #' NCCI 3 year emod
 #' 
-#' @param year loss year
+#' @param year loss/accident year
 #' @param type loss type.  medical only "MO" or indemnity "IND"
 #' @param incurred net incurred amount
 #' 
