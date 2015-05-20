@@ -42,7 +42,7 @@ loss_ncci_validate <- function(year, type, incurred) {
                  Only most recent 3 years will be used.")
   }
   if (!is.numeric(incurred)) {
-    error <- c(error, "Error: incurred must be of type numeric")
+    errors <- c(errors, "Error: incurred must be of type numeric")
   }
   
   if (length(errors) > 0) {
