@@ -4,21 +4,20 @@
 \alias{emod.loss_ncci}
 \title{NCCI emod}
 \usage{
-\method{emod}{loss_ncci}(loss, payroll, emod_year = 2015,
-  primary_cut = 15500)
+\method{emod}{loss_ncci}(loss, payroll)
 }
 \description{
 NCCI emod
 }
 \examples{
-payroll <- list("2012" = data.frame(class = as.factor(c("8868", "9101")),
-                                    payroll = c(10000000, 2000000)),
-                "2013" = data.frame(class = as.factor(c("8868", "9101")),
-                                    payroll = c(10500000, 2200000)),
-                "2014" = data.frame(class = as.factor(c("8868", "9101")),
-                                    payroll = c(11000000, 2400000))
-            )
+payroll <- data.frame(class = as.factor(c("8868", "9101")),
+                      payroll = c(32000000, 6500000)
+                      )
 
+set.seed(1234)
+test <- loss_ncci(year = sample(c(2012, 2013, 2014), 20, replace = TRUE),
+                  type = sample(c("MO", "IND"), 20, replace = TRUE),
+                  incurred = rlnorm(20, 10, 2))
 emod(test, payroll)
 }
 

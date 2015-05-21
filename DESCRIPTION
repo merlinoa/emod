@@ -8,5 +8,6 @@ Authora@R: person("Andy", "Merlino", email = "merlinoa88@gmail.com", role =
 Description: calculates and communicates emod for report
 License: GPL-3
 Depends: R (>= 3.2.0)
+LazyData: true
 Imports:
     dplyr

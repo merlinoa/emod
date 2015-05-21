@@ -7,7 +7,7 @@
 loss_ncci(year, type, incurred)
 }
 \arguments{
-\item{year}{loss year}
+\item{year}{loss/accident year}
 
 \item{type}{loss type.  medical only "MO" or indemnity "IND"}
 
