@@ -2,4 +2,5 @@
 
 S3method(emod,loss_ncci)
 export(emod)
+export(emod_report)
 export(loss_ncci)
