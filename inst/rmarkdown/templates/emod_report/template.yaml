@@ -1,0 +1,4 @@
+name: Emod Report
+description: >
+ Template for creating an Emod report
+create_dir: true
